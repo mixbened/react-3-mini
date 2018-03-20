@@ -28,19 +28,37 @@ class App extends Component {
     this.deleteBuyer = this.deleteBuyer.bind( this );
   }
 
+  componentDidMount(){
+    this.getVehicles();
+    this.getPotentialBuyers();
+  }
+
   getVehicles() {
-    // axios (GET)
+    const promise = axios.get('https://joes-autos.herokuapp.com/api/vehicles');
+    promise.then((response) => {
+      this.setState({
+          vehiclesToDisplay: response.data,
+        })
+    })
     // setState with response -> vehiclesToDisplay
   }
 
   getPotentialBuyers() {
-    // axios (GET)
-    // setState with response -> buyersToDisplay
+    axios.get('https://joes-autos.herokuapp.com/api/buyers').then(r => {
+      this.setState({
+          buyersToDisplay: r.data,
+        })
+    })
   }
 
   sellCar( id ) {
-    // axios (DELETE)
-    // setState with response -> vehiclesToDisplay
+    axios.delete(`https://joes-autos.herokuapp.com/api/vehicles/${id}`).then((r) => {
+      this.setState({
+        vehiclesToDisplay: r.data.vehicles,
+      })
+    }).catch((err) => {
+      toast.error('Not Successfull')
+    })
   }
 
   filterByMake() {
@@ -58,8 +76,14 @@ class App extends Component {
   }
 
   updatePrice( priceChange, id ) {
-    // axios (PUT)
-    // setState with response -> vehiclesToDisplay
+    const promise = axios.put(`https://joes-autos.herokuapp.com/api/vehicles/${id}/${priceChange}`);
+    promise.then((r) => {
+      this.setState({
+        vehiclesToDisplay: r.data.vehicles,
+      })
+    }).catch((err) => {
+      toast.error('Not Successfull');
+    }) 
   }
 
   addCar() {
@@ -70,7 +94,19 @@ class App extends Component {
       year: this.refs.year.value,
       price: this.refs.price.value
     };
-
+    const promise = axios.post('https://joes-autos.herokuapp.com/api/vehicles', {
+      "make": newCar.make,
+      "model": newCar.model,
+      "year": newCar.color,
+      "color": newCar.year,
+      "price": newCar.price
+    }).then((resp) => {
+      this.setState({
+        vehiclesToDisplay: resp.data.vehicles
+      })
+    }).catch((err) => {
+      console.log('new Vehicle error', err)
+    })
     // axios (POST)
     // setState with response -> vehiclesToDisplay
   }
